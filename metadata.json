@@ -1,0 +1,6 @@
+{
+  "name": "Respen TV",
+  "description": "Streaming saluran TV langsung dari daftar putar M3U gratis dengan fitur pencarian dan favorit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
