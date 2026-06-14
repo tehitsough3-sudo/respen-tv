@@ -30,6 +30,16 @@ interface IPTVPlayerProps {
   onChannelOffline?: (url: string) => void;
 }
 
+function getPlayableErrorMessage(url: string = ''): string {
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && url.startsWith('http://')) {
+    return 'Gagal memuat: Mixed Content. Halaman web dimuat dengan HTTPS aman, tetapi saluran ini menggunakan alamat HTTP biasa (tidak aman) yang diblokir oleh kebijakan keamanan browser Anda. Silakan pilih saluran lain yang menggunakan tautan HTTPS.';
+  }
+  if (isStaticDeployment()) {
+    return 'Gagal memuat saluran di GitHub Pages. Ini disebabkan oleh pemblokiran kebijakan CORS (Cross-Origin Resource Sharing) browser pada server tayangan, atau tautan sedang offline. Di hosting statis, putar saluran yang mendukung akses CORS atau pasang ekstensi bypass seperti "CORS Unblock" di Chrome/Firefox Anda.';
+  }
+  return 'Saluran tidak dapat diakses. Ini bisa disebabkan oleh pemblokiran CORS browser, stream mati, atau butuh VPN.';
+}
+
 export default function IPTVPlayer({ 
   channel, 
   isFavorite, 
@@ -194,9 +204,7 @@ export default function IPTVPlayer({
                 break;
               default:
                 setIsLoading(false);
-                setErrorMsg(
-                  'Saluran tidak dapat diakses. Ini bisa disebabkan oleh pemblokiran CORS browser, stream mati, atau butuh VPN.'
-                );
+                setErrorMsg(getPlayableErrorMessage(channel?.url));
                 if (channel) {
                   onChannelOffline?.(channel.url);
                 }
@@ -237,7 +245,7 @@ export default function IPTVPlayer({
 
   const handleNativeError = () => {
     setIsLoading(false);
-    setErrorMsg('Gagal memuat tayangan. Saluran ini sedang offline atau tidak mendukung CORS.');
+    setErrorMsg(getPlayableErrorMessage(channel?.url));
     if (channel) {
       onChannelOffline?.(channel.url);
     }
