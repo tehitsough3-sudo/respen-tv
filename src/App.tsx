@@ -147,10 +147,27 @@ export default function App() {
         }
 
         const parsed = parseM3U(content);
-        setChannels(parsed);
+        
+        // Filter channels to only include World Cup / Piala Dunia channels as requested
+        const worldCupFiltered = parsed.filter(ch => {
+          const cat = (ch.category || '').toLowerCase();
+          const name = (ch.name || '').toLowerCase();
+          return (
+            cat.includes('piala dunia') ||
+            cat.includes('world cup') ||
+            cat.includes('worldcup') ||
+            cat.includes('fifa') ||
+            name.includes('piala dunia') ||
+            name.includes('world cup') ||
+            name.includes('worldcup') ||
+            name.includes('fifa')
+          );
+        });
 
-        if (parsed.length > 0) {
-          setActiveChannel(parsed[0]);
+        setChannels(worldCupFiltered);
+
+        if (worldCupFiltered.length > 0) {
+          setActiveChannel(worldCupFiltered[0]);
         } else {
           setActiveChannel(null);
         }
