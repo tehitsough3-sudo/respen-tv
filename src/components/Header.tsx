@@ -11,6 +11,31 @@ import {
 } from 'lucide-react';
 import logoUrl from '../assets/images/respen_tv_logo_1781392805397.jpg';
 
+const LogoIcon = () => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full scale-[1.05]">
+    <defs>
+      <linearGradient id="logo-indigo-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#6366f1" />
+        <stop offset="50%" stopColor="#8b5cf6" />
+        <stop offset="100%" stopColor="#ec4899" />
+      </linearGradient>
+      <linearGradient id="logo-dark-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#0f172a" />
+        <stop offset="100%" stopColor="#020617" />
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#logo-dark-bg)" stroke="#1e293b" strokeWidth="1.5" />
+    <circle cx="50" cy="50" r="38" stroke="#312e81" strokeWidth="0.8" strokeDasharray="3 3" />
+    <rect x="23" y="29" width="54" height="42" rx="9" fill="#020617" stroke="url(#logo-indigo-pink)" strokeWidth="2.5" />
+    <path d="M42 29 L32 15" stroke="url(#logo-indigo-pink)" strokeWidth="2" strokeLinecap="round" />
+    <path d="M58 29 L68 15" stroke="url(#logo-indigo-pink)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="32" cy="15" r="3" fill="#ec4899" />
+    <circle cx="68" cy="15" r="3" fill="#6366f1" />
+    <text x="50" y="58" textAnchor="middle" fill="url(#logo-indigo-pink)" fontSize="26" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="-1">R</text>
+    <text x="50" y="66" textAnchor="middle" fill="#94a3b8" fontSize="8" fontWeight="bold" fontFamily="monospace" letterSpacing="1">TV</text>
+  </svg>
+);
+
 interface HeaderProps {
   playlistUrl: string;
   onPlaylistUrlChange: (url: string) => void;
@@ -54,7 +79,7 @@ export default function Header({
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <Video className="w-6 h-6 text-indigo-400" />
+              <LogoIcon />
             )}
           </div>
           <div>

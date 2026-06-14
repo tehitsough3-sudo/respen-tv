@@ -50,6 +50,7 @@ export default function ChannelList({
   
   // Offline filter & scanning states
   const [hideOffline, setHideOffline] = useState(true);
+  const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [scanTotal, setScanTotal] = useState(0);
@@ -485,7 +486,7 @@ export default function ChannelList({
                     className={`relative rounded-xl border p-2.5 transition group cursor-pointer flex ${
                       viewMode === 'grid' 
                         ? 'flex-col justify-between items-center text-center gap-2 h-36' 
-                        : 'align-center justify-between gap-3 h-16'
+                        : 'items-center justify-between gap-3 h-16'
                     } ${
                       isActive 
                         ? 'bg-indigo-600/15 border-indigo-500/60 shadow-md shadow-indigo-600/5' 
@@ -500,19 +501,19 @@ export default function ChannelList({
                       <div className={`shrink-0 flex items-center justify-center rounded-lg bg-slate-950 font-bold border ${
                         isActive ? 'border-indigo-500/40' : 'border-slate-800'
                       } ${viewMode === 'grid' ? 'h-14 w-14 p-1.5' : 'h-11 w-11 p-1'}`}>
-                        {ch.logo ? (
+                        {ch.logo && !brokenLogos[ch.logo] ? (
                           <img 
                             src={ch.logo} 
                             alt={ch.name} 
                             className="h-full w-full object-contain"
                             referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              // If image fails, replace with textual fallback
-                              (e.target as HTMLElement).style.display = 'none';
+                            onError={() => {
+                              if (ch.logo) {
+                                setBrokenLogos(prev => ({ ...prev, [ch.logo]: true }));
+                              }
                             }}
                           />
-                        ) : null}
-                        {(!ch.logo) && (
+                        ) : (
                           <span className={`text-[10px] uppercase font-mono tracking-wider ${isActive ? 'text-indigo-400' : 'text-slate-400'}`}>
                             {ch.name.substring(0, 3)}
                           </span>

@@ -66,6 +66,7 @@ export default function IPTVPlayer({
   const [currentQualityIndex, setCurrentQualityIndex] = useState<number>(-1);
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [playerLogoError, setPlayerLogoError] = useState(false);
 
   // Controls auto-hide timeout
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,6 +86,7 @@ export default function IPTVPlayer({
     setCurrentQualityIndex(-1);
     setAnalysisData(null);
     setIsAnalyzing(true);
+    setPlayerLogoError(false);
 
     // Destroy existing Hls instance
     if (hlsRef.current) {
@@ -521,23 +523,23 @@ export default function IPTVPlayer({
           >
             {/* Top Bar (Channel Info in Stream) */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {channel.logo ? (
+              <div className="flex items-center gap-3 min-w-0">
+                {channel.logo && !playerLogoError ? (
                   <img 
                     src={channel.logo} 
                     alt={channel.name} 
                     referrerPolicy="no-referrer"
-                    className="h-10 w-10 object-contain rounded-lg bg-slate-900/65 p-1 border border-slate-800"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
+                    className="h-10 w-10 object-contain rounded-lg bg-slate-900/65 p-1 border border-slate-800 shrink-0"
+                    onError={() => {
+                      setPlayerLogoError(true);
                     }}
                   />
                 ) : (
-                  <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold shrink-0">
                     <Tv className="h-5 w-5" />
                   </div>
                 )}
-                <div>
+                <div className="min-w-0">
                   <h4 className="text-white font-bold truncate max-w-xs sm:max-w-md group-hover:text-amber-400 transition">
                     {channel.name}
                   </h4>
@@ -615,7 +617,7 @@ export default function IPTVPlayer({
                       step="0.05"
                       value={muted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-16 sm:w-24 accent-indigo-500 h-1 bg-slate-800 rounded-lg cursor-pointer transition-all focus:outline-none"
+                      className="hidden sm:block w-16 sm:w-24 accent-indigo-500 h-1 bg-slate-800 rounded-lg cursor-pointer transition-all focus:outline-none"
                     />
                   </div>
                 </div>
