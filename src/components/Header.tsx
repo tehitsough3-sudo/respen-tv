@@ -29,6 +29,7 @@ export default function Header({
   const [editingUrl, setEditingUrl] = useState(playlistUrl);
   const [showInput, setShowInput] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -43,13 +44,18 @@ export default function Header({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         {/* Logo and App Title */}
         <div className="flex items-center gap-3">
-          <div className="h-14 w-14 rounded-full overflow-hidden bg-slate-900 border border-slate-800/80 shadow-lg shadow-indigo-600/10 flex-shrink-0 flex items-center justify-center">
-            <img 
-              src={logoUrl} 
-              alt="Logo Respen TV" 
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
+          <div className="h-14 w-14 rounded-full overflow-hidden bg-slate-950 border border-slate-800/80 shadow-lg shadow-indigo-600/15 flex-shrink-0 flex items-center justify-center">
+            {!imgError ? (
+              <img 
+                src={logoUrl} 
+                alt="Logo Respen TV" 
+                className="w-full h-full object-cover animate-fade-in"
+                onError={() => setImgError(true)}
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <Video className="w-6 h-6 text-indigo-400" />
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2">
