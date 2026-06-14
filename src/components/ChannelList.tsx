@@ -12,6 +12,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { IPTVChannel } from '../types';
+import { isStaticDeployment } from '../utils/staticCheck';
 
 interface ChannelListProps {
   channels: IPTVChannel[];
@@ -76,6 +77,9 @@ export default function ChannelList({
       const promises = batch.map(async (ch) => {
         let isOnline = true;
         try {
+          if (isStaticDeployment()) {
+            throw new Error("Skipping API call on static host");
+          }
           const response = await fetch(`/api/analyze-hls?url=${encodeURIComponent(ch.url)}`);
           if (response.ok) {
             const contentType = response.headers.get("content-type");

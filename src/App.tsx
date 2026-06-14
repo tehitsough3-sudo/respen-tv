@@ -18,6 +18,7 @@ import ChannelList from './components/ChannelList';
 import SplashScreen from './components/SplashScreen';
 import { parseM3U } from './utils/m3uParser';
 import { IPTVChannel } from './types';
+import { isStaticDeployment } from './utils/staticCheck';
 
 const DEFAULT_PLAYLIST = 'https://raw.githubusercontent.com/doms9/iptv/refs/heads/default/M3U8/TV.m3u8';
 
@@ -101,37 +102,39 @@ export default function App() {
         let content = '';
         let response;
         
-        // Try fetching via backend proxy first to bypass standard CORS errors
-        try {
-          const proxyUrl = `/api/fetch-playlist?url=${encodeURIComponent(playlistUrl)}`;
-          response = await fetch(proxyUrl);
-          if (response.ok) {
-            content = await response.text();
-          } else {
-            // If the proxy server returned a structured error payload, let's extract and propagate it
-            try {
-              const errBody = await response.json();
-              if (errBody && errBody.error) {
-                throw new Error(errBody.error);
+        // Try fetching via backend proxy first to bypass standard CORS errors (skip if static like GitHub Pages)
+        if (!isStaticDeployment()) {
+          try {
+            const proxyUrl = `/api/fetch-playlist?url=${encodeURIComponent(playlistUrl)}`;
+            response = await fetch(proxyUrl);
+            if (response.ok) {
+              content = await response.text();
+            } else {
+              // If the proxy server returned a structured error payload, let's extract and propagate it
+              try {
+                const errBody = await response.json();
+                if (errBody && errBody.error) {
+                  throw new Error(errBody.error);
+                }
+              } catch (jsonErr: any) {
+                if (jsonErr.message && !jsonErr.message.includes("Unexpected token")) {
+                  throw jsonErr;
+                }
               }
-            } catch (jsonErr: any) {
-              if (jsonErr.message && !jsonErr.message.includes("Unexpected token")) {
-                throw jsonErr;
-              }
+              console.warn('Backend proxy fetch failed, trying direct fetch as fallback...');
             }
-            console.warn('Backend proxy fetch failed, trying direct fetch as fallback...');
+          } catch (proxyErr: any) {
+            // Propagate clear user-facing messages directly
+            if (proxyErr.message && (
+              proxyErr.message.includes("HTML") || 
+              proxyErr.message.includes("pengalihan") || 
+              proxyErr.message.includes("loop") || 
+              proxyErr.message.includes("M3U")
+            )) {
+              throw proxyErr;
+            }
+            console.warn('Backend proxy unreachable, trying direct fetch as fallback:', proxyErr);
           }
-        } catch (proxyErr: any) {
-          // Propagate clear user-facing messages directly
-          if (proxyErr.message && (
-            proxyErr.message.includes("HTML") || 
-            proxyErr.message.includes("pengalihan") || 
-            proxyErr.message.includes("loop") || 
-            proxyErr.message.includes("M3U")
-          )) {
-            throw proxyErr;
-          }
-          console.warn('Backend proxy unreachable, trying direct fetch as fallback:', proxyErr);
         }
 
         // If proxy failed or didn't get content, try direct fetch

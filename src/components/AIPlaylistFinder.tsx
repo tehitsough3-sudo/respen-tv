@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { isStaticDeployment } from '../utils/staticCheck';
 import { 
   Sparkles, 
   Search, 
@@ -55,6 +56,71 @@ export default function AIPlaylistFinder({ onSelectPlaylist, currentPlaylistUrl 
     setIsFallback(false);
     setFallbackReason(null);
     setSearched(true);
+
+    if (isStaticDeployment()) {
+      // Return high-quality pre-vetted public playlists immediately for static hosting
+      setTimeout(() => {
+        const queryLower = searchQuery.toLowerCase();
+        
+        const allStatic = [
+          {
+            title: "Piala Dunia & Sports TV (TV.m3u8)",
+            description: "Daftar saluran khusus bertema olahraga sepakbola dan saluran lokal pilihan terpopuler.",
+            url: "https://raw.githubusercontent.com/doms9/iptv/refs/heads/default/M3U8/TV.m3u8",
+            category: "Sports & Local",
+            source: "GitHub doms9"
+          },
+          {
+            title: "IPTV Indonesia (id.m3u8)",
+            description: "Daftar playlist resmi iptv-org berisi siaran lokal Indonesia paling lengkap, terstruktur, dan bersih.",
+            url: "https://iptv-org.github.io/iptv/countries/id.m3u8",
+            category: "Indonesia",
+            source: "GitHub iptv-org"
+          },
+          {
+            title: "IPTV Global Sports (sports.m3u8)",
+            description: "Rangkuman siaran televisi berbasis olahraga global terlengkap dari komunitas open source.",
+            url: "https://iptv-org.github.io/iptv/categories/sports.m3u8",
+            category: "Global Sports",
+            source: "GitHub iptv-org"
+          },
+          {
+            title: "IPTV Global News (news.m3u8)",
+            description: "Kumpulan siaran televisi berita dunia terkemuka sperti BBC, CNN, DW, Al Jazeera secara real-time.",
+            url: "https://iptv-org.github.io/iptv/categories/news.m3u8",
+            category: "Global News",
+            source: "GitHub iptv-org"
+          },
+          {
+            title: "IPTV Entertainment & Movies (movies.m3u8)",
+            description: "Stasiun tv hiburan komedi petualangan, kartun, sinema, dan drama dari repositori global.",
+            url: "https://iptv-org.github.io/iptv/categories/movies.m3u8",
+            category: "Entertainment",
+            source: "GitHub iptv-org"
+          }
+        ];
+        
+        let matches = [];
+        if (queryLower.includes("indonesia") || queryLower.includes("lokal") || queryLower.includes("nasional") || queryLower.includes("id")) {
+          matches = [allStatic[1], allStatic[0]];
+        } else if (queryLower.includes("sport") || queryLower.includes("olahraga") || queryLower.includes("bola") || queryLower.includes("piala") || queryLower.includes("dunia")) {
+          matches = [allStatic[0], allStatic[2]];
+        } else if (queryLower.includes("news") || queryLower.includes("berita")) {
+          matches = [allStatic[3]];
+        } else if (queryLower.includes("movie") || queryLower.includes("film") || queryLower.includes("drama") || queryLower.includes("entertainment") || queryLower.includes("hiburan")) {
+          matches = [allStatic[4]];
+        } else {
+          matches = allStatic;
+        }
+        
+        setResults(matches);
+        setIsFallback(true);
+        setFallbackReason("Pencarian AI real-time dinonaktifkan di media statis (GitHub Pages). Berikut adalah tautan database playlist open-source paling relevan.");
+        setLoading(false);
+      }, 500);
+      return;
+    }
+    
     try {
       const res = await fetch('/api/ai-search-playlists', {
         method: 'POST',

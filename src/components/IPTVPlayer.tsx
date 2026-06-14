@@ -19,6 +19,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { IPTVChannel } from '../types';
+import { isStaticDeployment } from '../utils/staticCheck';
 
 interface IPTVPlayerProps {
   channel: IPTVChannel | null;
@@ -84,6 +85,9 @@ export default function IPTVPlayer({
     const runValidationAndLoad = async () => {
       let currentAnalysis: any = null;
       try {
+        if (isStaticDeployment()) {
+          throw new Error("Skipping API call on static host");
+        }
         const response = await fetch(`/api/analyze-hls?url=${encodeURIComponent(channel.url)}`);
         if (!active) return;
         if (response.ok) {
@@ -102,7 +106,7 @@ export default function IPTVPlayer({
           }
         }
       } catch (err: any) {
-        console.warn('Pre-analysis check error, but trying playback regardless:', err);
+        console.warn('Pre-analysis check skipped or error, trying playback directly:', err);
       }
 
       if (!active) return;

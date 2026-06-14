@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Tv, Sparkles, AlertTriangle, ShieldCheck, Play, ArrowRight, Activity, Terminal } from 'lucide-react';
 import { IPTVChannel } from '../types';
+import { isStaticDeployment } from '../utils/staticCheck';
 
 interface SplashScreenProps {
   channels: IPTVChannel[];
@@ -86,29 +87,33 @@ export default function SplashScreen({
         let useFallback = false;
         let data: any = null;
 
-        try {
-          const response = await fetch('/api/analyze-hls-batch', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ urls: batchUrls })
-          });
+        if (isStaticDeployment()) {
+          useFallback = true;
+        } else {
+          try {
+            const response = await fetch('/api/analyze-hls-batch', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ urls: batchUrls })
+            });
 
-          if (!isCurrentRunActive) return;
+            if (!isCurrentRunActive) return;
 
-          if (response.ok) {
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-              data = await response.json();
+            if (response.ok) {
+              const contentType = response.headers.get("content-type");
+              if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+              } else {
+                useFallback = true;
+              }
             } else {
               useFallback = true;
             }
-          } else {
+          } catch (err) {
             useFallback = true;
           }
-        } catch (err) {
-          useFallback = true;
         }
 
         if (!isCurrentRunActive) return;
