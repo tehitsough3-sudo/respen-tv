@@ -1,0 +1,25 @@
+{
+  "name": "Respen TV - IPTV Player",
+  "short_name": "Respen TV",
+  "description": "Pemutar IPTV modern, responsif, dan elegan untuk saluran TV nasional Indonesia dan siaran global teratas.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "categories": ["entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
