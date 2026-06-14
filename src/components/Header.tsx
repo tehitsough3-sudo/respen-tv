@@ -9,6 +9,7 @@ import {
   Video,
   ListPlus
 } from 'lucide-react';
+import logoUrl from '../assets/images/respen_tv_logo_1781392805397.jpg';
 
 interface HeaderProps {
   playlistUrl: string;
@@ -44,7 +45,7 @@ export default function Header({
         <div className="flex items-center gap-3">
           <div className="h-14 w-14 rounded-full overflow-hidden bg-slate-900 border border-slate-800/80 shadow-lg shadow-indigo-600/10 flex-shrink-0 flex items-center justify-center">
             <img 
-              src="/src/assets/images/respen_tv_logo_1781392805397.jpg" 
+              src={logoUrl} 
               alt="Logo Respen TV" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
