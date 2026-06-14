@@ -83,6 +83,9 @@ export default function SplashScreen({
         const batch = channelsToScan.slice(currentIndex, currentIndex + batchSize);
         const batchUrls = batch.map(ch => ch.url);
 
+        let useFallback = false;
+        let data: any = null;
+
         try {
           const response = await fetch('/api/analyze-hls-batch', {
             method: 'POST',
@@ -95,9 +98,66 @@ export default function SplashScreen({
           if (!isCurrentRunActive) return;
 
           if (response.ok) {
-            const data = await response.json();
-            if (!isCurrentRunActive) return;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              data = await response.json();
+            } else {
+              useFallback = true;
+            }
+          } else {
+            useFallback = true;
+          }
+        } catch (err) {
+          useFallback = true;
+        }
 
+        if (!isCurrentRunActive) return;
+
+        // Static host fallback (e.g. GitHub Pages) without active node proxy
+        if (useFallback) {
+          try {
+            const staticResults = await Promise.all(
+              batch.map(async (ch) => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s response allowance
+                try {
+                  // Probe with no-cors so we do not get blocked by target servers' lack of CORS header config
+                  await fetch(ch.url, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    signal: controller.signal
+                  });
+                  clearTimeout(timeoutId);
+                  return { url: ch.url, status: 'online' };
+                } catch (e: any) {
+                  clearTimeout(timeoutId);
+                  // Repeat once via HEAD if GET had minor fetch timeout
+                  const subController = new AbortController();
+                  const subTimeoutId = setTimeout(() => subController.abort(), 2000);
+                  try {
+                    await fetch(ch.url, {
+                      method: 'HEAD',
+                      mode: 'no-cors',
+                      signal: subController.signal
+                    });
+                    clearTimeout(subTimeoutId);
+                    return { url: ch.url, status: 'online' };
+                  } catch (subErr) {
+                    clearTimeout(subTimeoutId);
+                    return { url: ch.url, status: 'offline' };
+                  }
+                }
+              })
+            );
+
+            data = { results: staticResults };
+          } catch (staticGlobalErr) {
+            data = { results: batch.map(ch => ({ url: ch.url, status: 'offline' })) };
+          }
+        }
+
+        try {
+          if (data && data.results) {
             const resultsMap = new Map<string, string>();
             if (data.results && Array.isArray(data.results)) {
               data.results.forEach((resItem: { url: string; status: string }) => {

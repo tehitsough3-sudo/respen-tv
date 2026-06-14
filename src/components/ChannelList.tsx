@@ -74,22 +74,54 @@ export default function ChannelList({
     while (index < channelsToScan.length && !abortRef.current) {
       const batch = channelsToScan.slice(index, index + batchSize);
       const promises = batch.map(async (ch) => {
+        let isOnline = true;
         try {
           const response = await fetch(`/api/analyze-hls?url=${encodeURIComponent(ch.url)}`);
           if (response.ok) {
-            const data = await response.json();
-            if (data.status === 'offline' || data.status === 'error') {
-              onMarkOffline?.(ch.url);
-              setScanOfflineCount(prev => prev + 1);
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const data = await response.json();
+              if (data.status === 'offline' || data.status === 'error') {
+                isOnline = false;
+              }
+            } else {
+              throw new Error("No JSON from API, likely static environment");
             }
           } else {
+            throw new Error("API failed");
+          }
+        } catch (err) {
+          // Client-side fallback if backend API is not responding or doesn't support the endpoint
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
+            await fetch(ch.url, {
+              method: 'GET',
+              mode: 'no-cors',
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            isOnline = true;
+          } catch (e) {
+            try {
+              const subController = new AbortController();
+              const subTimeoutId = setTimeout(() => subController.abort(), 1800);
+              await fetch(ch.url, {
+                method: 'HEAD',
+                mode: 'no-cors',
+                signal: subController.signal
+              });
+              clearTimeout(subTimeoutId);
+              isOnline = true;
+            } catch (subE) {
+              isOnline = false;
+            }
+          }
+        } finally {
+          if (!isOnline) {
             onMarkOffline?.(ch.url);
             setScanOfflineCount(prev => prev + 1);
           }
-        } catch (err) {
-          onMarkOffline?.(ch.url);
-          setScanOfflineCount(prev => prev + 1);
-        } finally {
           if (!abortRef.current) {
             setScanProgress(p => Math.min(p + 1, channelsToScan.length));
           }
