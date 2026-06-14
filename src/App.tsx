@@ -226,6 +226,16 @@ export default function App() {
       localStorage.setItem('iptv_recent', JSON.stringify(updated));
       return updated;
     });
+
+    // Melakukan gulir otomatis yang mulus ke pemutar media pada perangkat seluler/hp
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        const playerSection = document.getElementById('media-player-section');
+        if (playerSection) {
+          playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 80);
+    }
   };
 
   const handleClearRecentlyWatched = () => {
@@ -327,14 +337,6 @@ export default function App() {
               onChannelOffline={handleMarkChannelOffline}
             />
 
-            {/* Quick Informational Tips Card */}
-            <div className="p-4 rounded-xl bg-slate-900/30 border border-slate-800/60 text-xs text-slate-400 flex items-start gap-3">
-              <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold text-slate-200 block mb-0.5">Aman &amp; Pribadi</span>
-                Semua pemrosesan daftar putar M3U8 dilakukan 100% di browser Anda (sisi klien). Tidak ada data streaming, link kustom, atau riwayat saluran favorit/tontonan Anda yang dikirim ke server luar. Privasi Anda terlindungi penuh.
-              </div>
-            </div>
           </motion.div>
 
           {/* Interactive Channel List Section (lg:col-span-5) */}

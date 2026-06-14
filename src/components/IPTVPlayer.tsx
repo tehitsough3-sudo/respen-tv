@@ -67,6 +67,7 @@ export default function IPTVPlayer({
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [playerLogoError, setPlayerLogoError] = useState(false);
+  const [showTips, setShowTips] = useState(false);
 
   // Controls auto-hide timeout
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -431,7 +432,17 @@ export default function IPTVPlayer({
           ref={videoRef}
           id="iptv-video-element"
           className="w-full h-full object-contain cursor-pointer"
-          onClick={togglePlay}
+          onClick={() => {
+            // Pada perangkat layar sentuh, ketukan pertama menampilkan bilah kontrol jika sedang disembunyikan
+            if (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+              if (!showControls) {
+                setShowControls(true);
+                resetControlsTimeout();
+                return;
+              }
+            }
+            togglePlay();
+          }}
           playsInline
         />
 
@@ -480,36 +491,53 @@ export default function IPTVPlayer({
 
         {/* Error Overlay */}
         {errorMsg && !isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 z-20 p-8 text-center animate-fade-in">
-            <AlertTriangle className="h-12 w-12 text-rose-500 mb-3 animate-bounce" />
-            <h4 className="text-lg font-bold text-slate-200">Koneksi Stream Gagal</h4>
-            <p className="text-sm text-slate-400 mt-1 max-w-md">
-              {errorMsg}
-            </p>
-            <div className="mt-5 flex gap-3">
-              <button 
-                onClick={retryStream}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-semibold transition flex items-center gap-2 cursor-pointer border border-slate-700"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Coba Lagi
-              </button>
-              <div className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition cursor-help relative group/tooltip">
-                Tips Pemutaran
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-slate-900 border border-slate-850 rounded-xl shadow-xl text-left text-xs pointer-events-none opacity-0 group-hover/tooltip:opacity-100 transition duration-200 z-50 text-slate-300 leading-relaxed font-normal">
-                  <div className="font-bold text-white mb-1 flex items-center gap-1">
-                    <Info className="h-3 w-3 text-indigo-400" />
-                    Penjelasan CORS:
-                  </div>
-                  Beberapa siaran TV membatasi akses regional atau membutuhkan header CORS yang cocok.
-                  <ul className="list-disc pl-4 mt-1 space-y-1">
-                    <li>Gunakan ekstensi browser <strong>&quot;Allow CORS&quot;</strong> jika memutar di desktop.</li>
-                    <li>Coba saluran demo stabil di kategori <strong>&quot;Demo HLS&quot;</strong>.</li>
-                    <li>Gunakan VPN jika saluran diblokir wilayah.</li>
-                  </ul>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 z-20 p-6 text-center animate-fade-in overflow-y-auto">
+            {!showTips ? (
+              <>
+                <AlertTriangle className="h-10 w-10 text-rose-500 mb-2 animate-bounce" />
+                <h4 className="text-base font-bold text-slate-200">Koneksi Stream Gagal</h4>
+                <p className="text-xs text-slate-400 mt-1 max-w-sm leading-relaxed">
+                  {errorMsg}
+                </p>
+                <div className="mt-4 flex gap-3">
+                  <button 
+                    onClick={retryStream}
+                    className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition flex items-center gap-2 cursor-pointer border border-slate-700"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Coba Lagi
+                  </button>
+                  <button 
+                    onClick={() => setShowTips(true)}
+                    className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Info className="h-3.5 w-3.5" />
+                    Tips Pemutaran
+                  </button>
                 </div>
+              </>
+            ) : (
+              <div className="w-full max-w-md p-4 bg-slate-900 border border-slate-800 rounded-xl text-left animate-fade-in">
+                <div className="font-bold text-white text-xs mb-2 flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span className="flex items-center gap-1.5 text-indigo-400">
+                    <Info className="h-4 w-4" />
+                    Penyebab &amp; Solusi Pemutaran
+                  </span>
+                  <button 
+                    onClick={() => setShowTips(false)}
+                    className="text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-950 text-[10px]"
+                  >
+                    Kembali
+                  </button>
+                </div>
+                <ul className="list-disc pl-4 space-y-1.5 text-slate-300 text-[11px] leading-relaxed">
+                  <li><strong>CORS Block (Utama):</strong> Browser membatasi akses regional link TV. Pasang ekstensi <strong>&quot;Allow CORS&quot;</strong> di Chrome/Firefox Anda untuk kelancaran.</li>
+                  <li><strong>Tautan Offline:</strong> Saluran ini mungkin sedang dalam perbaikan (offline) sementara dari penyedianya.</li>
+                  <li><strong>Mixed Content:</strong> Beberapa saluran menggunakan tautan http non-aman yang diblokir otomatis oleh protokol https kami.</li>
+                  <li><strong>Blokir Wilayah:</strong> Gunakan VPN (lokasi Indonesia/sesuai) jika saluran dilindungi hak siar wilayah.</li>
+                </ul>
               </div>
-            </div>
+            )}
           </div>
         )}
 

@@ -232,7 +232,7 @@ export default function ChannelList({
   };
 
   return (
-    <div id="channel-explorer-section" className="bg-slate-900/40 border border-slate-800 rounded-2xl flex flex-col h-[720px] overflow-hidden">
+    <div id="channel-explorer-section" className="bg-slate-900/40 border border-slate-800 rounded-2xl flex flex-col h-[480px] sm:h-[580px] lg:h-[720px] overflow-hidden">
       
       {/* Search and Quick Filters Header */}
       <div className="p-4 border-b border-slate-800 bg-slate-900/60 flex flex-col gap-3">
@@ -246,7 +246,7 @@ export default function ChannelList({
               setSearchQuery(e.target.value);
               setLimit(80); // Reset render limit on search
             }}
-            className="w-full bg-slate-950 text-slate-100 placeholder-slate-500 pl-11 pr-10 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-medium text-sm"
+            className="w-full bg-slate-950 text-slate-100 placeholder-slate-500 pl-11 pr-10 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-medium text-sm text-[16px] sm:text-sm"
           />
           {searchQuery && (
             <button 
@@ -259,7 +259,7 @@ export default function ChannelList({
         </div>
 
         {/* Dynamic Horizontal Categories Scroll */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-2 px-2">
           {/* Item: Semua */}
           <button
             onClick={() => {

@@ -1,0 +1,29 @@
+<svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logo-indigo-pink-pwa" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#6366f1" />
+      <stop offset="50%" stopColor="#8b5cf6" />
+      <stop offset="100%" stopColor="#ec4899" />
+    </linearGradient>
+    <linearGradient id="logo-dark-bg-pwa" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#0f172a" />
+      <stop offset="100%" stopColor="#020617" />
+    </linearGradient>
+  </defs>
+  <!-- Background Circle Box -->
+  <circle cx="256" cy="256" r="240" fill="url(#logo-dark-bg-pwa)" stroke="#1e293b" strokeWidth="6" />
+  <circle cx="256" cy="256" r="190" stroke="#312e81" strokeWidth="3" strokeDasharray="15 15" />
+  
+  <!-- Antennae -->
+  <path d="M216 150 L160 80" stroke="url(#logo-indigo-pink-pwa)" strokeWidth="10" strokeLinecap="round" />
+  <path d="M296 150 L352 80" stroke="url(#logo-indigo-pink-pwa)" strokeWidth="10" strokeLinecap="round" />
+  <circle cx="160" cy="80" r="15" fill="#ec4899" />
+  <circle cx="352" cy="80" r="15" fill="#6366f1" />
+
+  <!-- TV Case screen -->
+  <rect x="110" y="150" width="292" height="230" rx="40" fill="#020617" stroke="url(#logo-indigo-pink-pwa)" strokeWidth="12" />
+  
+  <!-- Stylized Letter R for Respen TV -->
+  <text x="256" y="295" textAnchor="middle" fill="url(#logo-indigo-pink-pwa)" fontSize="130" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="-4">R</text>
+  <text x="256" y="340" textAnchor="middle" fill="#94a3b8" fontSize="36" fontWeight="bold" fontFamily="monospace" letterSpacing="5">TV</text>
+</svg>

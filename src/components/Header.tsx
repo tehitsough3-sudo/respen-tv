@@ -116,9 +116,14 @@ export default function Header({
       {/* Playlist URL Editor & Controller Bar */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-            URL Aktif: <span className="font-mono text-slate-500 truncate max-w-xs md:max-w-md select-all ml-1 bg-slate-950/40 px-2 py-0.5 rounded border border-slate-800/80">{playlistUrl}</span>
+          <div className="flex items-center gap-1.5 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-start bg-slate-950/30 sm:bg-transparent p-2 sm:p-0 rounded-xl border border-slate-800/40 sm:border-none">
+            <span className="flex items-center gap-1.5 shrink-0">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              URL Aktif:
+            </span>
+            <span className="font-mono text-slate-500 truncate max-w-[140px] min-[360px]:max-w-[180px] min-[440px]:max-w-[260px] sm:max-w-xs md:max-w-md select-all ml-1 bg-slate-950/50 px-2 py-0.5 rounded border border-slate-800/80 block text-right sm:text-left">
+              {playlistUrl}
+            </span>
           </div>
           
           <div className="flex items-center gap-2">
